@@ -16,20 +16,17 @@ class MyScreen:
         # track
         self.track = pygame.image.load("24.PNG").convert()
 
-        # # pygame surface screen
-        # self.x = -980
-        # self.y = -1100
-
-        self.x = -1070
-        self.y = -1150
+        # pygame surface screen
+        self.x = -980
+        self.y = -1100
 
         # track surface
-        self.surface_x = 1470
+        self.surface_x = 1450
         self.surface_y = 1450
 
         # player / human
-        self.human_x = 400
-        self.human_y = 300
+        self.human_x = 470
+        self.human_y = 350
         self.human_xy = (self.human_x, self.human_y)
 
         self.human_w_or_h = 50
@@ -42,7 +39,7 @@ class MyScreen:
 
         #  monster
         self.monster = pygame.image.load("IMG_3125.PNG").convert()
-        self.monsterrightsize = pygame.transform.scale(self.monster, (150, 150))
+        self.monsterrightsize = pygame.transform.scale(self.monster, (100, 100))
 
         self.monstersurface = pygame.Surface.copy(self.track)
 
@@ -68,9 +65,8 @@ class MyScreen:
 
 
     def update(self, surface: pygame.surface.Surface): 
-        self.monster_x = self.surface_x + self.scare_x 
-        self.monster_y = self.surface_y + self.scare_y
-        self.surface_human_xy = [self.surface_x, self.surface_y]
+        self.monster_x = self.surface_x + self.scare_x - 60
+        self.monster_y = self.surface_y + self.scare_y 
 
         #getting the subsurface OF THE HUMAN to determine if there is colour
         subsurface_player = self.track.subsurface ((self.surface_x, self.surface_y, self.human_w_or_h, self.human_w_or_h))
@@ -79,8 +75,8 @@ class MyScreen:
 
         self.counter += 1
 
-        # self.scare_x = 500
-        # self.scare_y = 500
+        self.scare_x = 500
+        self.scare_y = 500
 
         # direction control
         if cliprect_player == (0, 0, 0, 0):
@@ -121,16 +117,13 @@ class MyScreen:
             self.scare_x *= self.direction[0]
             self.scare_y = 0
 
-
+        # 
         if self.counter % 200 == 0:
-            if 0 <= self.monster_x <= 3000 and  0 <= self.monster_y < 2780:
-                self.monstercorrdinate.append([self.monster_x, self.monster_y])  
-        
+            self.monstercorrdinate.append([self.monster_x, self.monster_y])  
 
-
+                
         for i, n in enumerate (self.monstercorrdinate):
-            subsurface_monster = self.track.subsurface ((n[0], n[1], 150, 150))
-            # subsurface_monster = self.track.subsurface ((n[0], n[1], self.human_w_or_h, self.human_w_or_h))
+            subsurface_monster = self.track.subsurface ((n[0], n[1], self.human_w_or_h, self.human_w_or_h))
             self.cliprect_monster = subsurface_monster.get_bounding_rect(255)
             # self.rect_monster = subsurface_monster.get_offset
 
@@ -139,21 +132,6 @@ class MyScreen:
 
         if len(self.monstercorrdinate) > 2:
             del self.monstercorrdinate[0]
-
-        self.checking()
-
-
-    def checking(self):
-        for n in self.monstercorrdinate:
-            if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + 150:
-                if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + 150:
-                    self.die += 1
-
-        print(self.monstercorrdinate)
-        print(self.surface_human_xy)
-        print(self.die)
-    
-    
 
 
     def draw(self, surface: pygame.surface.Surface):
@@ -175,8 +153,8 @@ class Game:
 
     def __init__(self):
         pygame.init()
-        self.WIDTH = 800
-        self.HEIGHT = 600
+        self.WIDTH = 1000
+        self.HEIGHT = 800
         self.SIZE = (self.WIDTH, self.HEIGHT)
 
         self.screen = pygame.display.set_mode(self.SIZE)
@@ -222,11 +200,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.run()
-
-
-# things to be done
-# 1) add timer (within 2 min)
-# 2) add health bar
-# 3) add menu screen
-# 4) add crystal??
-#       - collision of subsurface??
