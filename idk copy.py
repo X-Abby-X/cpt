@@ -50,7 +50,9 @@ class MyScreen:
         self.scare_x = 500
         self.scare_y = 500
 
-        self.timeappear = 30
+        self.timeappear = 50
+        # crystal
+        self.crystal_corrdinate = [[220, 230], [2700, 210], [260, 2710], [2700, 2720]]
 
         # colour
         self.BLACK = (0, 0, 0)
@@ -58,6 +60,7 @@ class MyScreen:
         # game stat
         self.counter = 0
         self.die = 0
+        self.score = 0
 
 
     
@@ -146,10 +149,15 @@ class MyScreen:
             if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + self.monster_w_or_h:
                 if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + self.monster_w_or_h:
                     self.die += 1
+        
+        for n in self.crystal_corrdinate:
+            if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + 50:
+                if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + 50:
+                    self.score += 1
 
         print(self.monstercorrdinate)
         print(self.surface_human_xy)
-        print(self.die)
+        print(self.die, self.score)
 
 
     def draw(self, surface: pygame.surface.Surface):
@@ -159,6 +167,9 @@ class MyScreen:
 
         for n in self.monstercorrdinate:
             self.monstersurface.blit(self.monsterrightsize, (n[0], n[1]))
+        
+        for n in self.crystal_corrdinate:
+            pygame.draw.rect(self.monstersurface, (0, 0, 0), (n[0], n[1], 50, 50))
 
         surface.blit(self.monstersurface, (self.x, self.y))
 
