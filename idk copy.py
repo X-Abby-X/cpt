@@ -38,8 +38,10 @@ class MyScreen:
         self.direction = [0, 0]
 
         #  monster
+        self.monster_w_or_h = 150
+
         self.monster = pygame.image.load("IMG_3125.PNG").convert()
-        self.monsterrightsize = pygame.transform.scale(self.monster, (100, 100))
+        self.monsterrightsize = pygame.transform.scale(self.monster, (self.monster_w_or_h, self.monster_w_or_h))
 
         self.monstersurface = pygame.Surface.copy(self.track)
 
@@ -47,6 +49,8 @@ class MyScreen:
 
         self.scare_x = 500
         self.scare_y = 500
+
+        self.timeappear = 30
 
         # colour
         self.BLACK = (0, 0, 0)
@@ -67,6 +71,7 @@ class MyScreen:
     def update(self, surface: pygame.surface.Surface): 
         self.monster_x = self.surface_x + self.scare_x - 60
         self.monster_y = self.surface_y + self.scare_y 
+        self.surface_human_xy = [self.surface_x, self.surface_y]
 
         #getting the subsurface OF THE HUMAN to determine if there is colour
         subsurface_player = self.track.subsurface ((self.surface_x, self.surface_y, self.human_w_or_h, self.human_w_or_h))
@@ -118,8 +123,9 @@ class MyScreen:
             self.scare_y = 0
 
         # 
-        if self.counter % 200 == 0:
-            self.monstercorrdinate.append([self.monster_x, self.monster_y])  
+        if self.counter % self.timeappear == 0:
+            if 0 <= self.monster_x <= 3000 and  0 <= self.monster_y < 2780:
+                self.monstercorrdinate.append([self.monster_x, self.monster_y])  
 
                 
         for i, n in enumerate (self.monstercorrdinate):
@@ -132,6 +138,18 @@ class MyScreen:
 
         if len(self.monstercorrdinate) > 2:
             del self.monstercorrdinate[0]
+        
+        self.checking()
+
+    def checking(self):
+        for n in self.monstercorrdinate:
+            if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + self.monster_w_or_h:
+                if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + self.monster_w_or_h:
+                    self.die += 1
+
+        print(self.monstercorrdinate)
+        print(self.surface_human_xy)
+        print(self.die)
 
 
     def draw(self, surface: pygame.surface.Surface):
