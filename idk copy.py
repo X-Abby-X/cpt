@@ -2,7 +2,7 @@ from typing import List
 
 import pygame
 from pygame import Color
-from pygame.locals import K_ESCAPE, KEYDOWN, QUIT, K_RETURN
+from pygame.locals import K_ESCAPE, KEYDOWN, QUIT, K_RETURN, K_x, K_p
 screen = pygame.display.set_mode((1000, 800), flags=pygame.DOUBLEBUF | pygame.HWSURFACE, vsync=True)
 
 class ScreenInterface:
@@ -10,7 +10,93 @@ class ScreenInterface:
     def update(self): ...
     def draw(self, surface: pygame.surface.Surface): ...
 
+class PauseScreen:
+    def __init__(self, parent: ScreenInterface):
+        self.parent = parent
 
+        self.monster = pygame.image.load("123.png").convert()
+        self.monsterrightsize = pygame.transform.scale(self.monster, (100, 100))
+    
+        self.font5 = pygame.font.Font("Dark.ttf", 50)
+        self.instructiontext = self.font5.render("press \"p\" to resume game ", True, (225, 225, 225))
+
+    def handle_events(self, events: List[pygame.event.Event]) -> None:
+        for event in events:
+            if event.type == KEYDOWN:
+                if event.key == K_p:
+                    Game.set_screen(self.parent)
+
+
+    def draw(self, surface: pygame.Surface) -> None:
+        self.parent.draw(surface)
+
+        background = pygame.Surface((1000, 8000), pygame.SRCALPHA)
+        pygame.draw.rect(background, (0, 0, 0, 128), (0, 0, 1000, 8000))
+
+        surface.blit(background, (0, 0))
+        surface.blit(self.monsterrightsize, (0, 0))
+        surface.blit(self.instructiontext, (50 , 700))
+
+
+
+class SecretScreen1:
+    def __init__(self, parent: ScreenInterface):
+        self.parent = parent
+
+        self.paper = pygame.image.load("phonto.jpg").convert()
+        self.paperrightsize = pygame.transform.scale(self.paper, (750, 410))
+
+        self.font5 = pygame.font.Font("Dark.ttf", 50)
+        self.instructiontext = self.font5.render("press \"x\" to exit and resume game ", True, (225, 225, 225))
+
+    def handle_events(self, events: List[pygame.event.Event]) -> None:
+        
+        for event in events:
+            if event.type == KEYDOWN:
+                if event.key == K_x:
+                    Game.set_screen(self.parent)
+
+    def update(self) -> None:
+        pass
+
+    def draw(self, surface: pygame.Surface) -> None:
+        self.parent.draw(surface)
+
+        background = pygame.Surface((1000, 8000), pygame.SRCALPHA)
+        pygame.draw.rect(background, (0, 0, 0, 128), (0, 0, 1000, 8000))
+
+        surface.blit(background, (0, 0))
+        surface.blit(self.paperrightsize, (80, 150))
+        surface.blit(self.instructiontext, (50 , 700))
+
+class SecretScreen2:
+    def __init__(self, parent: ScreenInterface):
+        self.parent = parent
+
+        self.letter = pygame.image.load("letter2.png").convert()
+        self.letterrightsize = pygame.transform.scale(self.letter, (707, 675))
+    
+        self.font5 = pygame.font.Font("Dark.ttf", 40)
+        self.instructiontext = self.font5.render("press \"x\" to exit and resume game ", True, (225, 225, 225))
+
+    def handle_events(self, events: List[pygame.event.Event]) -> None:
+        for event in events:
+            if event.type == KEYDOWN:
+                if event.key == K_x:
+                    Game.set_screen(self.parent)
+
+    def update(self) -> None:
+        pass
+
+    def draw(self, surface: pygame.Surface) -> None:
+        self.parent.draw(surface)
+
+        background = pygame.Surface((1000, 8000), pygame.SRCALPHA)
+        pygame.draw.rect(background, (0, 0, 0, 128), (0, 0, 1000, 8000))
+
+        surface.blit(background, (0, 0))
+        surface.blit(self.letterrightsize, (150, 50))
+        surface.blit(self.instructiontext, (50 , 750))
 
 class StartScreen:
     def __init__(self):
@@ -18,7 +104,11 @@ class StartScreen:
         self.portalrightsize = pygame.transform.scale(self.portal, (260, 320))
 
         font1 = pygame.font.Font("Dark.ttf", 100)
+        font2 = pygame.font.Font("Dark.ttf", 50)
         self.instructiontext = font1.render("Press enter to start game", True, (225, 225, 225))
+        self.rule1text = font2.render("Collect 55 diamond orbs", True, (225, 225, 225))
+        self.rule2text = font2.render("Beware! The monster us chasing you", True, (225, 225, 225))
+        self.rule3text = font2.render("Use Arrow keys to move", True, (225, 225, 225))
 
     def handle_events(self, events: List[pygame.event.Event]): 
         for event in events:
@@ -32,6 +122,9 @@ class StartScreen:
     def draw(self, surface: pygame.surface.Surface): 
         surface.blit(self.portalrightsize, (350 , 50))
         surface.blit(self.instructiontext, (70, 400))
+        surface.blit(self.rule1text, (70, 550))
+        surface.blit(self.rule2text, (70, 610))
+        surface.blit(self.rule3text, (70, 670))
 
 class MyScreen:
     def __init__(self):
@@ -56,7 +149,8 @@ class MyScreen:
         self.human = pygame.image.load("malak.PNG").convert()
         self.humanrightsize = pygame.transform.scale(self.human, (self.human_w_or_h, self.human_w_or_h))
 
-        self.step = 15
+        self.step = 10
+    
         self.direction = [0, 0]
 
         #  monster
@@ -83,8 +177,11 @@ class MyScreen:
         self.crystal_corrdinate = [[220, 230], [2700, 210], [260, 2710], [2700, 2720], [610, 1450], [2310, 1450], [1450, 2330], [1450, 610], [2320, 630], [2350, 230], [2690, 620], [2310, 2330], [2720, 2330], [2320, 2730], [610, 2360], [590, 2700], [250, 2360], [620, 600], [220, 600], [620, 230], [2310, 1050], [1930, 620], [1020, 620], [610, 1030], [610, 1880], [1060, 2330], [1890, 2330], [1450, 1880], [1450, 1010], [1010, 1460], [1870, 1460], [1690, 1460], [2080, 1460], [1190, 1460], [820, 1460], [610, 1680], [610, 2110], [610, 1220], [610, 820], [850, 610], [1250, 610], [1710, 610], [2130, 630], [1450, 1200], [1450, 820], [1450, 1690], [1450, 2080], [870, 2330], [1280, 2330], [1680, 2330], [2080, 2330], [2310, 1240], [2310, 830], [2310, 1690], [2310, 2050]]
 
         self.crystal_num = 55
-        # colour
-        self.BLACK = (0, 0, 0)
+        
+        # secret
+        self.secret_corrdinate = [[2750, 2790], [200, 195]]
+        self.secret = pygame.image.load("kiss.jpg").convert()
+        self.secretrightsize = pygame.transform.scale(self.secret, (20, 20))
 
         # game stat
         self.counter = 0
@@ -105,17 +202,20 @@ class MyScreen:
         self.font3 = pygame.font.Font("Dark.ttf", 80)
         self.font4 = pygame.font.Font("Dark.ttf", 75)
         self.font5 = pygame.font.Font("Dark.ttf", 10)
+        self.font6 = pygame.font.Font("Dark.ttf", 40)
         self.diesentence = self.font4.render("There are others to save. GET UP!", True, (225, 225, 225))
         self.winsentence = self.font3.render("You are stronger than I thought.", True, (225, 225, 225))
         self.winsentence2 = self.font2.render("Its time for you to move on", True, (100, 0, 0))
-    
+        self.pause = self.font6.render("press \"p\" to pause game ", True, (150, 0, 0))
 
-    
+
     def handle_events(self, events: List[pygame.event.Event]): 
         for event in events:
             if event.type == KEYDOWN:
-                if event.key == K_RETURN:
-                    self.game_start = True
+                # if event.key == K_RETURN:
+                #     self.game_start = True
+                if event.key == pygame.K_p:
+                    Game.set_screen(PauseScreen(self))
 
 
     def update(self): 
@@ -128,8 +228,8 @@ class MyScreen:
             #getting the subsurface OF THE HUMAN to determine if there is colour
             subsurface_player = self.track.subsurface ((self.surface_x, self.surface_y, self.human_w_or_h, self.human_w_or_h))
             cliprect_player = subsurface_player.get_bounding_rect(255)
-            # self.rect_player = subsurface_player.get_offset
 
+            # some variables
             self.counter += 1
 
             self.scare_x = 500
@@ -141,7 +241,9 @@ class MyScreen:
             
             # harder when score gets higher
             if self.score > 20:
+                self.step = 15
                 self.timeappear = 30
+
             if self.score > 40:
                 self.scare_x = 300
                 self.scare_y = 300
@@ -208,13 +310,24 @@ class MyScreen:
                 if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + self.monster_w_or_h:
                     if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + self.monster_w_or_h:
                         self.die -= 1
+
             
-            # chcking if touching crystal
+            # checking if touching crystal
             for i, n in enumerate (self.crystal_corrdinate):
                 if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + 50:
                     if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + 50:
                         self.score += 1
                         del self.crystal_corrdinate[i]
+            
+            # checking if touching secret (and which)
+            for i, n in enumerate (self.secret_corrdinate):
+                if n[0] - self.human_w_or_h <= self.surface_human_xy[0] <= n[0] + 50:
+                    if n[1]- self.human_w_or_h <= self.surface_human_xy[1] <= n[1] + 50:
+                        if n == [2750, 2790]:
+                            Game.set_screen(SecretScreen1(self))
+                        elif n ==[200, 195]:
+                            Game.set_screen(SecretScreen2(self))
+                        del self.secret_corrdinate[i]
             
             # text for score at the end 
             self.finalscoring = self.font1.render(f"you collect  {self.score} crystals", True, (225, 225, 225))
@@ -226,14 +339,19 @@ class MyScreen:
             if self.die == 0 or self.score == self.crystal_num:
                 self.start = False
 
+            print(self.scare_y, self.scare_x)
+
     def draw(self, surface: pygame.surface.Surface):
         if self.start == True:
-            surface.fill(self.BLACK)  # always the first drawing command
+            surface.fill((0, 0, 0))  # always the first drawing command
 
             self.monstersurface = pygame.Surface.copy(self.track)
 
             for n in self.crystal_corrdinate:
                 self.monstersurface.blit(self.crystalrightsize, (n[0], n[1]))
+
+            for n in self.secret_corrdinate:
+                self.monstersurface.blit(self.secretrightsize, (n[0], n[1]))
 
             for n in self.monstercorrdinate:
                 self.monstersurface.blit(self.monsterrightsize, (n[0], n[1]))
@@ -244,10 +362,10 @@ class MyScreen:
 
             surface.blit(self.health, (0 , 0))
             surface.blit(self.scoring, (800 , 0))
-
+            surface.blit(self.pause, (30 , 730))
 
         elif self.start == False:
-            surface.fill(self.BLACK)
+            surface.fill((0, 0, 0))
 
             surface.blit(self.portalrightsize, (350 , 50))
             if self.win == True:
@@ -257,7 +375,6 @@ class MyScreen:
                 surface.blit(self.diesentence, (20, 400))
 
             surface.blit(self.finalscoring, (70, 550))
-
 
 
 class Game:
@@ -276,12 +393,10 @@ class Game:
 
         Game.instance = self
     
+    @classmethod
+    def set_screen(cls, new_screen: ScreenInterface):
+        cls.instance.current_screen = new_screen
 
-    # @classmethod
-    # def set_screen(cls, new_screen: ScreenInterface):
-    #     cls.instance.current_screen = new_screen
-
-    
     def run(self):
         running = True
         while running:
